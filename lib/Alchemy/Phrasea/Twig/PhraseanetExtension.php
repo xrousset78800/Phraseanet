@@ -83,7 +83,7 @@ class PhraseanetExtension extends \Twig_Extension
         if ($record instanceof ElasticsearchRecord) {
             $highlights = $record->getHighlight();
             if (false === isset($highlights[$field])) {
-                return implode('; ', (array) $value);
+                return (array) $value;
             }
 
             $highlightValue = $highlights[$field];
@@ -95,10 +95,10 @@ class PhraseanetExtension extends \Twig_Extension
                 }, $highlightValue)));
             }
 
-            return implode('; ', (array) $highlightValue);
+            return (array) $highlightValue;
         }
 
-        return implode('; ', (array) $value);
+        return (array) $value;
     }
 
     /**

@@ -118,13 +118,34 @@
 
 {% macro caption(record, can_see_business, display_exif, limitedWidth = false) %}
     <dl class="{% if limitedWidth %}{% else %}dl-horizontal{% endif %}">
-    {% for name, value in record.getCaption(caption_field_order(record, can_see_business)) %}
+    {% for name, values in record.getCaption(caption_field_order(record, can_see_business)) %}
         <dt>{{ caption_field_label(record, name) }}</dt>
-        <dd>{{ caption_field(record, name, value)|e|highlight }}</dd>
+        {% set facetLimit = record.getDatabox().get_meta_structure().get_element_by_name(name).getFacetValuesLimit() %}
+        <dd>
+            {% set plop = caption_field(record, name, values) %}
+
+        {% for key, val in plop %}
+            {% if facetLimit > 0 %}
+            <span class="search-term" onclick="byTagSearch('{{ val |e|highlight }}')">
+            {% endif %}
+                {{ val |e|highlight }}{% if key + 1 != values|length %}; {% endif %}
+            {% if facetLimit > 0 %}
+            </span>
+            {% endif %}
+        {% endfor %}
+        </dd>
     {% endfor %}
     </dl>
     {% if display_exif|default(true) and app.getAuthenticator().user is not none and user_setting('technical_display') == 'group' %}
         <hr/>
         {% include 'common/technical_datas.html.twig' %}
     {% endif %}
+
+    <script type="text/javascript">
+        function byTagSearch(term) {
+            closePreview();
+            checkFilters();
+            newSearch(term);
+        }
+    </script>
 {% endmacro %}
