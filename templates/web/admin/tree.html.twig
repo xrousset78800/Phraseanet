@@ -245,13 +245,16 @@
 </div>
 <script type="text/javascript">
   $(document).ready(function(){
-    $('[data-confirm]').click(function() {
+    $('#dataConfirmModal').hide();
+
+    function showWarning() {
       var modal = $('#dataConfirmModal');
 
       modal.show();
 
       $("#dataConfirmOK").click(function(){
         modal.hide();
+        $("[data-confirm]").removeAttr("data-confirm");
         return true;
       });
 
@@ -260,8 +263,9 @@
         $("#TREE_DATABASES").first().click();
         return false;
       });
-    });
+    }
 
-    $('#dataConfirmModal').hide();
+    $('body').on( "click", "[data-confirm]", showWarning );
+
   });
 </script>
