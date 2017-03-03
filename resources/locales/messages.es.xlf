@@ -6173,7 +6173,7 @@
       <trans-unit id="ec4e670686b423ccb3b0976660cc70f9c5a22782" resname="Telechargeable">
         <jms:reference-file line="225">web/admin/subdefs.html.twig</jms:reference-file>
         <source>Telechargeable</source>
-        <target>Telechargeable</target>
+        <target>Telechargeable par l'interface</target>
       </trans-unit>
       <trans-unit id="3ec1ae061c27325c7ecb543adf91235e22cbc9ed" resname="Template">
         <jms:reference-file line="93">actions/Feedback/list.html.twig</jms:reference-file>

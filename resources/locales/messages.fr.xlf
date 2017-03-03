@@ -6148,7 +6148,7 @@ Pour les utilisateurs authentifiés, la demande de validation est également dis
       </trans-unit>
       <trans-unit id="ec4e670686b423ccb3b0976660cc70f9c5a22782" resname="Telechargeable" approved="yes">
         <source>Telechargeable</source>
-        <target state="translated">Téléchargeable</target>
+        <target state="translated">Téléchargeable par l'interface</target>
         <jms:reference-file line="229">web/admin/subdefs.html.twig</jms:reference-file>
       </trans-unit>
       <trans-unit id="3ec1ae061c27325c7ecb543adf91235e22cbc9ed" resname="Template" approved="yes">
