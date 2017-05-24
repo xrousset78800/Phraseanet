@@ -1,4 +1,4 @@
-Phraseanet 4.0 - Digital Asset Management application
+Phraseanet 4.0 - Digital Asset Management application 
 =====================================================
 
 [![Build Status](https://secure.travis-ci.org/alchemy-fr/Phraseanet.png?branch=master)](http://travis-ci.org/alchemy-fr/Phraseanet)
