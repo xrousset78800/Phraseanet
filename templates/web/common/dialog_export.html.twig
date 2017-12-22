@@ -295,7 +295,18 @@
                     <div class="control-group">
                         <label class="control-label" for="order_usage">{{ 'commande::utilisation prevue' | trans }}</label>
                         <div class="controls">
-                          <textarea rows="5" name="use" id="order_usage"></textarea>
+                            <textarea rows="5" name="use" id="order_usage"></textarea>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="order_subdefs">{{ 'commande::sous definitions' | trans }}</label>
+                        <div class="controls">
+                    {% for key, values in download.get_subdefs_orderable() %}
+                            <label for="order_subdef_{{ key }}" class="checkbox">
+                                <input type="checkbox" id="order_subdef_{{ key }}" name="obj[]" value="{{ values }}" />
+                                {{ values }}
+                            </label>
+                    {% endfor %}
                         </div>
                     </div>
 

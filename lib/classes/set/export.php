@@ -42,6 +42,7 @@ class set_export extends set_abstract
     protected $display_orderable;
     protected $display_download;
     protected $display_ftp;
+    protected $available_subdefs;
     protected $ftp_datas;
     protected $list;
     protected $businessFieldsAccess;
@@ -349,6 +350,17 @@ class set_export extends set_abstract
     public function get_display_download()
     {
         return $this->display_download;
+    }
+
+    /**
+     * @return array
+     */
+    public function get_subdefs_orderable()
+    {
+
+        /* Patch */
+        return ["preview" => "Preview", "thumbnail" => "Thumbnail", "source" => "Original document"];
+        //return $this->available_subdefs;
     }
 
     /**
