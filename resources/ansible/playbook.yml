@@ -4,15 +4,18 @@
   vars_files:
     - vars/all.yml
   roles:
-    - server
-    - vagrant_local
-    - nginx
-    - mariadb
-    - elasticsearch
-    - php
-    - swftools
-    - xdebug
-    - composer
-    - mailcatcher
-    - node
+ #   - server
+ #   - repositories
+ #   - vagrant_local
+ #   - nginx
+ #   - mariadb
+ #   - elasticsearch
+ #   - rabbitmq
+ #   - php
+ #   - xdebug
+ #   - composer
+ #   - mailcatcher
+ #   - node
+ #   - yarn
     - app
+    - ffmpeg
