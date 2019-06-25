@@ -1,0 +1,74 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/Phraseanet    # (~ didn’t work because Docker refuses '~' in bind mount dest)
+    docker:
+      - image: circleci/php:7.0.27-cli-node-browsers
+      - image: circleci/mysql:5.7
+        environment:
+          - MYSQL_USER=root
+          - MYSQL_PASSWORD=
+          - MYSQL_ALLOW_EMPTY_PASSWORD=true
+#      - image: docker.elastic.co/elasticsearch/elasticsearch:5.6.1
+#        environment:
+#          http.host: '0.0.0.0'
+#          http.port: 9200
+#          xpack.security.enabled: false
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - elasticsearch-2.4.3 # relative to the build directory
+            - node_modules
+            - ~/.composer
+
+      - run:
+          name: Application setup (ok)
+          command: |
+            sudo apt-get update
+            sudo apt-get install automake libtool libicu-dev libzmq-dev mysql-client mysql-server zlib1g-dev libssh-dev librabbitmq-dev
+            sudo docker-php-ext-configure intl
+            sudo docker-php-ext-install intl bcmath pdo_mysql zip sockets
+            git clone https://github.com/alanxz/rabbitmq-c
+            cd rabbitmq-c && git checkout 2ca1774489328cde71195f5fa95e17cf3a80cb8a
+            cd rabbitmq-c && git submodule init && git submodule update && autoreconf -i && ./configure && make && sudo make install
+            set +o pipefail
+            yes '' | sudo pecl install zmq-beta
+      - run:
+          name: test circle (ok)
+          command: |
+            set +o pipefail
+            yes '' | sudo pecl install amqp
+            sudo docker-php-ext-enable zmq amqp
+            npm rebuild node-sass
+            composer install --no-progress --no-interaction --optimize-autoloader
+            npm i npm@latest -g
+            npm install
+            wget https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.3/elasticsearch-2.4.3.tar.gz
+            tar -xvf elasticsearch-2.4.3.tar.gz
+            sudo ./elasticsearch-2.4.3/bin/plugin install analysis-icu
+            mysql -h 127.0.0.1 -u root -e 'CREATE DATABASE update39_test;CREATE DATABASE ab_test;CREATE DATABASE db_test;SET @@global.sql_mode=STRICT_ALL_TABLES;SET @@global.max_allowed_packet=33554432;SET @@global.wait_timeout=999999;';
+            ./bin/developer system:uninstall -v
+            ./bin/setup system:install -v --email=test@phraseanet.com --password=test --db-host=127.0.0.1 --db-user=root --db-template=fr --db-password= --databox=db_test --appbox=ab_test --server-name=http://127.0.0.1 -y;
+            ./bin/developer ini:setup-tests-dbs -v
+            ./elasticsearch-2.4.3/bin/elasticsearch -d --host 127.0.0.1:9200
+            sleep 10 && wget --waitretry=5 --retry-connrefused -v http://127.0.0.1:9200/
+            ./bin/console searchengine:index:create -v
+            ./bin/developer phraseanet:regenerate-sqlite -v
+            ./bin/developer phraseanet:generate-js-fixtures -v
+            php -d memory_limit=-1 bin/phpunit -c phpunit.xml.dist;
+      - run:
+          name: Tests !!
+          command: |
+            case $CIRCLE_NODE_INDEX in 0) EXIT=0; php -d memory_limit=-1 bin/phpunit --log-junit $CIRCLE_TEST_REPORTS/phpunit/junit-unit.xml --exclude-group legacy || EXIT=$?; php -d memory_limit=-1 bin/phpunit --log-junit $CIRCLE_TEST_REPORTS/phpunit/junit-legacy-no-web.xml --group legacy --exclude-group web || EXIT=$?; exit $EXIT;; 1) php -d memory_limit=-1 bin/phpunit --log-junit $CIRCLE_TEST_REPORTS/phpunit/junit-legacy-web.xml --group web ;; esac:
+
+      - save_cache:
+          paths:
+            - ./vendor
+          key: v1-dependencies-{{ checksum "composer.json" }}
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
